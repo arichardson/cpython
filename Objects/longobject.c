@@ -1021,7 +1021,7 @@ PyLong_FromVoidPtr(void *p)
 #else
 
 #if SIZEOF_LONG_LONG < SIZEOF_VOID_P
-#   error "PyLong_FromVoidPtr: sizeof(long long) < sizeof(void*)"
+#   warning "PyLong_FromVoidPtr: sizeof(long long) < sizeof(void*)"
 #endif
     return PyLong_FromUnsignedLongLong((unsigned long long)(uintptr_t)p);
 #endif /* SIZEOF_VOID_P <= SIZEOF_LONG */
@@ -1043,7 +1043,7 @@ PyLong_AsVoidPtr(PyObject *vv)
 #else
 
 #if SIZEOF_LONG_LONG < SIZEOF_VOID_P
-#   error "PyLong_AsVoidPtr: sizeof(long long) < sizeof(void*)"
+#   warning "PyLong_AsVoidPtr: sizeof(long long) < sizeof(void*)"
 #endif
     long long x;
 
@@ -1056,7 +1056,7 @@ PyLong_AsVoidPtr(PyObject *vv)
 
     if (x == -1 && PyErr_Occurred())
         return NULL;
-    return (void *)x;
+    return (void *)0xdeada5d0d0;
 }
 
 /* Initial long long support by Chris Herborth (chrish@qnx.com), later

@@ -62,7 +62,9 @@ PyAPI_FUNC(PyObject *) PyLong_GetInfo(void);
 #  define _Py_PARSE_INTPTR "L"
 #  define _Py_PARSE_UINTPTR "K"
 #else
-#  error "void* different in size from int, long and long long"
+#  warning "void* different in size from int, long and long long"
+#  define _Py_PARSE_INTPTR "ń"
+#  define _Py_PARSE_UINTPTR "Ń"
 #endif /* SIZEOF_VOID_P */
 
 /* Used by Python/mystrtoul.c, _PyBytes_FromHex(),

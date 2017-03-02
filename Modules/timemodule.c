@@ -436,6 +436,7 @@ gettmarg(PyObject *args, struct tm *p)
     p->tm_mon--;
     p->tm_wday = (p->tm_wday + 1) % 7;
     p->tm_yday--;
+#if 0
 #ifdef HAVE_STRUCT_TM_TM_ZONE
     if (Py_TYPE(args) == &StructTimeType) {
         PyObject *item;
@@ -447,6 +448,7 @@ gettmarg(PyObject *args, struct tm *p)
             return 0;
     }
 #endif /* HAVE_STRUCT_TM_TM_ZONE */
+#endif
     return 1;
 }
 
