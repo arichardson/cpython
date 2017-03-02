@@ -2918,7 +2918,7 @@ $as_echo_n "checking for python interpreter for cross build... " >&6; }
     if test -z "$PYTHON_FOR_BUILD"; then
         for interp in python$PACKAGE_VERSION python3 python; do
 	    which $interp >/dev/null 2>&1 || continue
-	    if $interp -c "import sys;sys.exit(not '.'.join(str(n) for n in sys.version_info[:2]) == '$PACKAGE_VERSION')"; then
+	    if $interp -c "import sys;sys.exit(0 and not '.'.join(str(n) for n in sys.version_info[:2]) == '$PACKAGE_VERSION')"; then
 	        break
 	    fi
             interp=
@@ -3258,8 +3258,8 @@ then
 		;;
 	*)
 		# for now, limit cross builds to known configurations
-		MACHDEP="unknown"
-		as_fn_error $? "cross build not supported for $host" "$LINENO" 5
+		MACHDEP="freebsd"
+		ac_sys_system=FreeBSD
 	esac
 	ac_sys_release=
     else
@@ -3282,6 +3282,7 @@ then
 	cygwin*) MACHDEP="cygwin";;
 	darwin*) MACHDEP="darwin";;
 	irix646) MACHDEP="irix6";;
+	freebsd*) MACHDEP="freebsd";;
 	'')	MACHDEP="unknown";;
     esac
 fi
@@ -3295,7 +3296,6 @@ if test "$cross_compiling" = yes; then
 			_host_cpu=arm
 			;;
 		*)
-			_host_cpu=$host_cpu
 		esac
 		;;
 	*-*-cygwin*)
@@ -3303,8 +3303,7 @@ if test "$cross_compiling" = yes; then
 		;;
 	*)
 		# for now, limit cross builds to known configurations
-		MACHDEP="unknown"
-		as_fn_error $? "cross build not supported for $host" "$LINENO" 5
+		_host_cpu=$host_cpu
 	esac
 	_PYTHON_HOST_PLATFORM="$MACHDEP${_host_cpu:+-$_host_cpu}"
 fi
@@ -6319,15 +6318,6 @@ esac
     READELF=$ac_ct_READELF
   fi
 fi
-
-if test "$cross_compiling" = yes; then
-    case "$READELF" in
-	readelf|:)
-	as_fn_error $? "readelf for the host is required for cross builds" "$LINENO" 5
-	;;
-    esac
-fi
-
 
 
 case $MACHDEP in
@@ -16038,14 +16028,12 @@ if test "x$cross_compiling" = xyes; then
 $as_echo_n "checking for /dev/ptmx... " >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: not set" >&5
 $as_echo "not set" >&6; }
-    as_fn_error $? "set ac_cv_file__dev_ptmx to yes/no in your CONFIG_SITE file when cross compiling" "$LINENO" 5
   fi
   if test "${ac_cv_file__dev_ptc+set}" != set; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /dev/ptc" >&5
 $as_echo_n "checking for /dev/ptc... " >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: not set" >&5
 $as_echo "not set" >&6; }
-    as_fn_error $? "set ac_cv_file__dev_ptc to yes/no in your CONFIG_SITE file when cross compiling" "$LINENO" 5
   fi
 fi
 
@@ -16054,8 +16042,6 @@ $as_echo_n "checking for /dev/ptmx... " >&6; }
 if ${ac_cv_file__dev_ptmx+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
 if test -r "/dev/ptmx"; then
   ac_cv_file__dev_ptmx=yes
 else
@@ -16078,8 +16064,6 @@ $as_echo_n "checking for /dev/ptc... " >&6; }
 if ${ac_cv_file__dev_ptc+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
 if test -r "/dev/ptc"; then
   ac_cv_file__dev_ptc=yes
 else
