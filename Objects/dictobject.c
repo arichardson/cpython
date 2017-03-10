@@ -287,6 +287,8 @@ PyDict_Fini(void)
     PyDict_ClearFreeList();
 }
 
+#define roundup2(x, y)  (((x)+((y)-1))&(~((y)-1)))
+
 #define DK_SIZE(dk) ((dk)->dk_size)
 #if SIZEOF_VOID_P > 4
 #define DK_IXSIZE(dk)                          \
@@ -301,7 +303,7 @@ PyDict_Fini(void)
             2 : sizeof(int32_t))
 #endif
 #define DK_ENTRIES(dk) \
-    ((PyDictKeyEntry*)(&(dk)->dk_indices.as_1[DK_SIZE(dk) * DK_IXSIZE(dk)]))
+    ((PyDictKeyEntry*)roundup2((uintptr_t)(&(dk)->dk_indices.as_1[DK_SIZE(dk) * DK_IXSIZE(dk)]), 32))
 
 #define DK_DEBUG_INCREF _Py_INC_REFTOTAL _Py_REF_DEBUG_COMMA
 #define DK_DEBUG_DECREF _Py_DEC_REFTOTAL _Py_REF_DEBUG_COMMA
