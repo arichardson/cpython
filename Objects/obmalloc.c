@@ -1230,6 +1230,8 @@ _PyObject_Alloc(int use_calloc, void *ctx, size_t nelem, size_t elsize)
     assert(nelem <= PY_SSIZE_T_MAX / elsize);
     nbytes = nelem * elsize;
 
+    goto redirect;
+
 #ifdef WITH_VALGRIND
     if (UNLIKELY(running_on_valgrind == -1))
         running_on_valgrind = RUNNING_ON_VALGRIND;
@@ -1456,7 +1458,11 @@ _PyObject_Free(void *ctx, void *p)
     if (p == NULL)      /* free(NULL) has no effect */
         return;
 
+return;
+
     _Py_AllocatedBlocks--;
+
+    goto redirect;
 
 #ifdef WITH_VALGRIND
     if (UNLIKELY(running_on_valgrind > 0))
@@ -1658,9 +1664,7 @@ _PyObject_Free(void *ctx, void *p)
         return;
     }
 
-#ifdef WITH_VALGRIND
 redirect:
-#endif
     /* We didn't allocate this address. */
     PyMem_RawFree(p);
 }
@@ -1679,6 +1683,8 @@ _PyObject_Realloc(void *ctx, void *p, size_t nbytes)
 
     if (p == NULL)
         return _PyObject_Alloc(0, ctx, 1, nbytes);
+
+    goto redirect;
 
 #ifdef WITH_VALGRIND
     /* Treat running_on_valgrind == -1 the same as 0 */
@@ -1713,9 +1719,7 @@ _PyObject_Realloc(void *ctx, void *p, size_t nbytes)
         }
         return bp;
     }
-#ifdef WITH_VALGRIND
  redirect:
-#endif
     /* We're not managing this block.  If nbytes <=
      * SMALL_REQUEST_THRESHOLD, it's tempting to try to take over this
      * block.  However, if we do, we need to copy the valid data from
