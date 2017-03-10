@@ -1,5 +1,6 @@
 /* Python interpreter top-level routines, including init/exit */
 
+#include <stdio.h>
 #include "Python.h"
 
 #include "Python-ast.h"
@@ -342,16 +343,21 @@ _Py_InitializeEx_Private(int install_sigs, int install_importlib)
         Py_LegacyWindowsStdioFlag = add_flag(Py_LegacyWindowsStdioFlag, p);
 #endif
 
+    fprintf(stderr, "%s: go\n", __func__);
     _PyRandom_Init();
+    fprintf(stderr, "%s: 2\n", __func__);
 
     interp = PyInterpreterState_New();
+    fprintf(stderr, "%s: 3\n", __func__);
     if (interp == NULL)
         Py_FatalError("Py_Initialize: can't make first interpreter");
 
     tstate = PyThreadState_New(interp);
+    fprintf(stderr, "%s: 4\n", __func__);
     if (tstate == NULL)
         Py_FatalError("Py_Initialize: can't make first thread");
     (void) PyThreadState_Swap(tstate);
+    fprintf(stderr, "%s: 5\n", __func__);
 
 #ifdef WITH_THREAD
     /* We can't call _PyEval_FiniThreads() in Py_FinalizeEx because
@@ -359,103 +365,139 @@ _Py_InitializeEx_Private(int install_sigs, int install_importlib)
        another running thread (see issue #9901).
        Instead we destroy the previously created GIL here, which ensures
        that we can call Py_Initialize / Py_FinalizeEx multiple times. */
+    fprintf(stderr, "%s: 6\n", __func__);
     _PyEval_FiniThreads();
+    fprintf(stderr, "%s: 7\n", __func__);
 
     /* Auto-thread-state API */
     _PyGILState_Init(interp, tstate);
+    fprintf(stderr, "%s: 8\n", __func__);
 #endif /* WITH_THREAD */
 
+    fprintf(stderr, "%s: 9\n", __func__);
     _Py_ReadyTypes();
 
+    fprintf(stderr, "%s: 10\n", __func__);
     if (!_PyFrame_Init())
         Py_FatalError("Py_Initialize: can't init frames");
 
+    fprintf(stderr, "%s: 11\n", __func__);
     if (!_PyLong_Init())
         Py_FatalError("Py_Initialize: can't init longs");
 
+    fprintf(stderr, "%s: 12\n", __func__);
     if (!PyByteArray_Init())
         Py_FatalError("Py_Initialize: can't init bytearray");
 
+    fprintf(stderr, "%s: 13\n", __func__);
     if (!_PyFloat_Init())
         Py_FatalError("Py_Initialize: can't init float");
 
+    fprintf(stderr, "%s: 14\n", __func__);
     interp->modules = PyDict_New();
     if (interp->modules == NULL)
         Py_FatalError("Py_Initialize: can't make modules dictionary");
 
     /* Init Unicode implementation; relies on the codec registry */
+    fprintf(stderr, "%s: 15\n", __func__);
     if (_PyUnicode_Init() < 0)
         Py_FatalError("Py_Initialize: can't initialize unicode");
+    fprintf(stderr, "%s: 16\n", __func__);
     if (_PyStructSequence_Init() < 0)
         Py_FatalError("Py_Initialize: can't initialize structseq");
 
+    fprintf(stderr, "%s: 17\n", __func__);
     bimod = _PyBuiltin_Init();
     if (bimod == NULL)
         Py_FatalError("Py_Initialize: can't initialize builtins modules");
+    fprintf(stderr, "%s: 18\n", __func__);
     _PyImport_FixupBuiltin(bimod, "builtins");
+    fprintf(stderr, "%s: 19\n", __func__);
     interp->builtins = PyModule_GetDict(bimod);
     if (interp->builtins == NULL)
         Py_FatalError("Py_Initialize: can't initialize builtins dict");
+    fprintf(stderr, "%s: 20\n", __func__);
     Py_INCREF(interp->builtins);
 
     /* initialize builtin exceptions */
+    fprintf(stderr, "%s: 21\n", __func__);
     _PyExc_Init(bimod);
 
+    fprintf(stderr, "%s: 22\n", __func__);
     sysmod = _PySys_Init();
     if (sysmod == NULL)
         Py_FatalError("Py_Initialize: can't initialize sys");
+    fprintf(stderr, "%s: 23\n", __func__);
     interp->sysdict = PyModule_GetDict(sysmod);
     if (interp->sysdict == NULL)
         Py_FatalError("Py_Initialize: can't initialize sys dict");
     Py_INCREF(interp->sysdict);
+    fprintf(stderr, "%s: 24\n", __func__);
     _PyImport_FixupBuiltin(sysmod, "sys");
+    fprintf(stderr, "%s: 25\n", __func__);
     PySys_SetPath(Py_GetPath());
+    fprintf(stderr, "%s: 26\n", __func__);
     PyDict_SetItemString(interp->sysdict, "modules",
                          interp->modules);
 
     /* Set up a preliminary stderr printer until we have enough
        infrastructure for the io module in place. */
+    fprintf(stderr, "%s: 27\n", __func__);
     pstderr = PyFile_NewStdPrinter(fileno(stderr));
     if (pstderr == NULL)
         Py_FatalError("Py_Initialize: can't set preliminary stderr");
+    fprintf(stderr, "%s: 28\n", __func__);
     _PySys_SetObjectId(&PyId_stderr, pstderr);
+    fprintf(stderr, "%s: 29\n", __func__);
     PySys_SetObject("__stderr__", pstderr);
     Py_DECREF(pstderr);
 
+    fprintf(stderr, "%s: 30\n", __func__);
     _PyImport_Init();
 
+    fprintf(stderr, "%s: 31\n", __func__);
     _PyImportHooks_Init();
 
     /* Initialize _warnings. */
+    fprintf(stderr, "%s: 32\n", __func__);
     _PyWarnings_Init();
 
     if (!install_importlib)
         return;
 
+    fprintf(stderr, "%s: 33\n", __func__);
     if (_PyTime_Init() < 0)
         Py_FatalError("Py_Initialize: can't initialize time");
 
+    fprintf(stderr, "%s: 34\n", __func__);
     import_init(interp, sysmod);
 
     /* initialize the faulthandler module */
+    fprintf(stderr, "%s: 35\n", __func__);
     if (_PyFaulthandler_Init())
         Py_FatalError("Py_Initialize: can't initialize faulthandler");
 
+    fprintf(stderr, "%s: 36\n", __func__);
     if (initfsencoding(interp) < 0)
         Py_FatalError("Py_Initialize: unable to load the file system codec");
 
+    fprintf(stderr, "%s: 37\n", __func__);
     if (install_sigs)
         initsigs(); /* Signal handling stuff, including initintr() */
 
+    fprintf(stderr, "%s: 38\n", __func__);
     if (_PyTraceMalloc_Init() < 0)
         Py_FatalError("Py_Initialize: can't initialize tracemalloc");
 
+    fprintf(stderr, "%s: 39\n", __func__);
     initmain(interp); /* Module __main__ */
+    fprintf(stderr, "%s: 40\n", __func__);
     if (initstdio() < 0)
         Py_FatalError(
             "Py_Initialize: can't initialize sys standard streams");
 
     /* Initialize warnings. */
+    fprintf(stderr, "%s: 41\n", __func__);
     if (PySys_HasWarnOptions()) {
         PyObject *warnings_module = PyImport_ImportModule("warnings");
         if (warnings_module == NULL) {
@@ -465,8 +507,10 @@ _Py_InitializeEx_Private(int install_sigs, int install_importlib)
         Py_XDECREF(warnings_module);
     }
 
+    fprintf(stderr, "%s: 42\n", __func__);
     if (!Py_NoSiteFlag)
         initsite(); /* Module site */
+    fprintf(stderr, "%s: done\n", __func__);
 }
 
 void
